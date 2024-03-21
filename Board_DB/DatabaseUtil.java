@@ -52,7 +52,7 @@ public class DatabaseUtil {
 //			if(!rs.next()) System.out.println("작성한 게시글이 없습니다!");			//게시글 있는지 체크
 			while(rs.next()){	//ResultSet.nest(); 데이터를 한 줄 가져온다. 데이터가 없으면 false 반환
 				System.out.println("인덱스: "+rs.getInt("id")+", 작성자: "+rs.getString("writer")+", 제목: "+rs.getString("subject")	//.getString() 매개변수에 몇번째 컬럼인지 인덱스를 적거나 id를 쌍따옴표 안에 적으면 된다.
-				+", 이메일: "+rs.getString("email")+", 비밀번호: "+rs.getString("passwd")+"\n");
+				+", 이메일: "+rs.getString("email")+", 비밀번호: "+rs.getString("passwd"));
 			}
 		}catch(SQLException e) {e.printStackTrace();
 		}finally {
@@ -84,19 +84,7 @@ public class DatabaseUtil {
 			disconnect(stmt);
 			disconnect(rs);
 		}				
-	}
-	
-	public void deleteBoard(int id) {
-		PreparedStatement pstmt = null;
-		try {
-			String sql = "DELETE FROM BOARD where id = ?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, id);
-			int count = pstmt.executeUpdate();
-			if(count>0) {System.out.println("DELETE 성공!");
-			}else {System.out.println("DELETE 실패...");}			
-		}catch(SQLException e) {e.printStackTrace();
-	}}	
+	}		
 	
 	public void searchBoard(String searchInfo) {
 		Statement stmt = null;
@@ -124,6 +112,41 @@ public class DatabaseUtil {
 		}
 	}
 	
+	public int sizeOfArticles() {
+		int size = 0;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			String sql = "SELECT COUNT(*) FROM BOARD";
+			stmt = con.createStatement();
+			rs = stmt.executeQuery(sql);
+			rs.next();
+			size = rs.getInt(1);// 1번째 컬럼의 값을 가져옵니다.
+		}catch(SQLException e) {e.printStackTrace();
+		}finally {
+			disconnect(con);
+			disconnect(stmt);
+			disconnect(rs);
+		}		
+		return size;
+	}
+	
+	public void deleteBoard(int id) {
+		PreparedStatement pstmt = null;
+		try {
+			String sql = "DELETE FROM BOARD where id = ?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			int count = pstmt.executeUpdate();
+			if(count>0) {System.out.println("DELETE 성공!");
+			}else {System.out.println("DELETE 실패...");}			
+		}catch(SQLException e) {e.printStackTrace();
+		}finally {
+			disconnect(con);
+			disconnect(pstmt);
+		}
+	}	
+	
 	public void updateBoard(String column, String boardInfo, int id) {
 		PreparedStatement pstmt = null;				
 		try {
@@ -136,10 +159,8 @@ public class DatabaseUtil {
 			}else {System.out.println("UPDATE 실패...");}			
 		}catch(SQLException e) {e.printStackTrace();
 		}finally {
-			try {
-				disconnect(con);
-				disconnect(pstmt);							
-			}catch(Exception e) {e.printStackTrace();}
+			disconnect(con);
+			disconnect(pstmt);
 	}}		
 	
 	public void connect() {		

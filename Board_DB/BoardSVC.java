@@ -65,10 +65,21 @@ public class BoardSVC {
 	public void removeArticles() {	//DB에 있는 게시글 삭제
 		BoardVO boardVO = new BoardVO();
 		printArticles();
+		databaseUtil.connect();		//sizeOfArticles 실행을 위해 연결
+		int size = databaseUtil.sizeOfArticles();
+		if(size == 0) {
+			System.out.println("게시글이 없으므로 종료합니다.");
+			return;
+		}
+		System.out.println("작성된 게시글의 수: "+size);
 		System.out.print("제거할 글의 인덱스를 입력하세요: ");
 		int index = Integer.parseInt(sc.nextLine());
 		databaseUtil.connect();
 		databaseUtil.setArticle(boardVO, index);
+		if(boardVO.getPasswd() == null) {		//게시글이 없으면 boardVO 생성자에서 값이 정해지지않아 null값을 반환
+			System.out.println("인덱스: "+index+" 게시글이 존재하지 않습니다.");
+			return;
+		}
 		System.out.print("제거할 게시글의 비밀번호를 입력하세요: ");
 		System.out.print("비밀번호 : ");
 		String passwd = sc.nextLine();
@@ -91,13 +102,25 @@ public class BoardSVC {
 	public void changeArticle() {		
 		BoardVO boardVO = new BoardVO();
 		printArticles();
+		databaseUtil.connect();		//sizeOfArticles 실행을 위해 연결
+		int size = databaseUtil.sizeOfArticles();
+		if(size == 0) {
+			System.out.println("게시글이 없으므로 종료합니다.");
+			return;
+		}
+		System.out.println("작성된 게시글의 수: "+size);
+		System.out.print("제거할 글의 인덱스를 입력하세요: ");
 		System.out.print("수정할 글의 인덱스를 입력하세요: ");
 		int index = Integer.parseInt(sc.nextLine());
 		databaseUtil.connect();
 		databaseUtil.setArticle(boardVO, index);
+		if(boardVO.getPasswd() == null) {		//게시글이 없으면 boardVO 생성자에서 값이 정해지지않아 null값을 반환
+			System.out.println("인덱스: "+index+" 게시글이 존재하지 않습니다.");
+			return;
+		}
 		System.out.print("수정할 게시글의 비밀번호를 입력하세요: ");
 		System.out.print("비밀번호 : ");
-		String passwd = sc.nextLine();
+		String passwd = sc.nextLine();		
 		if(boardVO.getPasswd().equals(passwd)) {	//인덱스, 비밀번호 일치
 			changeMenu(boardVO.getId());			//메뉴창 실행 + util의 update 실행 메서드 불러오기
 		}else {System.out.println("비밀번호가 다릅니다.");}	
@@ -141,7 +164,7 @@ public class BoardSVC {
 			databaseUtil.updateBoard("passwd", boardInfo, id);
 			break;
 		case "5":
-			System.out.print("게시글 수정 창 종료...");
+			System.out.println("게시글 수정 창 종료...");
 			return;
 	}
 	}
